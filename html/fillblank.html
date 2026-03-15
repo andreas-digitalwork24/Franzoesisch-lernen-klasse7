@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Lückentext - Trainer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav><a href="index.html">← Zurück</a></nav>
+    <main>
+        <h2>Lückentext: Das Verb Faire & Verneinung</h2>
+        <p>Fülle die Lücken mit der richtigen Form aus.</p>
+
+        <div id="exercise-box" style="background: white; padding: 20px; border-radius: 8px;">
+            <p>1. Je <input type="text" id="gap1" aria-label="Lücke 1"> du foot. (machen)</p>
+            <p>2. Nous <input type="text" id="gap2" aria-label="Lücke 2"> nos devoirs. (machen)</p>
+            <p>3. Il ne travaille <input type="text" id="gap3" aria-label="Lücke 3">. (nicht)</p>
+
+            <button onclick="checkAnswers()">Prüfen</button>
+            <button onclick="showSolutions()">Lösungen zeigen</button>
+            <p id="feedback"></p>
+        </div>
+    </main>
+
+    <script>
+        const solutions = { gap1: "fais", gap2: "faisons", gap3: "pas" };
+
+        function checkAnswers() {
+            let correct = 0;
+            for (let id in solutions) {
+                const input = document.getElementById(id);
+                if (input.value.trim().toLowerCase() === solutions[id]) {
+                    input.style.border = "2px solid green";
+                    correct++;
+                } else {
+                    input.style.border = "2px solid red";
+                }
+            }
+            document.getElementById('feedback').innerText = `${correct} von 3 richtig!`;
+        }
+
+        function showSolutions() {
+            for (let id in solutions) {
+                document.getElementById(id).value = solutions[id];
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Karteikarten - Trainer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav><a href="index.html">← Zurück</a></nav>
+    <main>
+        <h2>Karteikarten: Grundwortschatz</h2>
+        <div id="flashcard-app">
+            <div class="flashcard-wrapper" onclick="flipCard()" role="button" aria-label="Karteikarte umdrehen" tabindex="0">
+                <div class="flashcard" id="card">
+                    <div class="flashcard-face flashcard-front" id="front-text">Vorderseite</div>
+                    <div class="flashcard-face flashcard-back" id="back-text">Rückseite</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button onclick="prevCard()">Vorherige</button>
+                <button onclick="markAsLearned()" id="learn-btn">Als gelernt markieren</button>
+                <button onclick="nextCard()">Nächste</button>
+            </div>
+            <p id="counter" style="text-align: center;"></p>
+        </div>
+    </main>
+
+    <script>
+        const cards = [
+            // --- Begrüßung, Befinden, Verabschiedung ---
+            { f: "Hallo / Hi (unter Gleichaltrigen)", b: "Salut" },
+            { f: "Guten Tag / Hallo (allgemein)", b: "Bonjour" },
+            { f: "Kuckuck / Hallo (umgangssprachlich)", b: "Coucou" },
+            { f: "Wie geht's?", b: "Ça va ?" },
+            { f: "Es geht. / Mir geht es gut!", b: "Ça va. / Moi, ça va !" },
+            { f: "Super! / Toll!", b: "Super !" },
+            { f: "Naja. / Geht so.", b: "Bof" },
+            { f: "Bis dann! / Tschüss!", b: "À plus !" },
+            { f: "Auf Wiedersehen", b: "Au revoir" },
+            { f: "Bis morgen", b: "À demain" },
+            // --- Vorstellung & persönliche Infos ---
+            { f: "Wie heißt du?", b: "Tu t'appelles comment ?" },
+            { f: "Ich heiße… / Ich bin…", b: "Je m'appelle… / Moi, c'est…" },
+            { f: "Wie alt bist du?", b: "Tu as quel âge ?" },
+            { f: "Ich bin … Jahre alt.", b: "J'ai … ans." },
+            { f: "Wie alt ist er / sie?", b: "Il / Elle a quel âge ?" },
+            { f: "Er / Sie ist … Jahre alt.", b: "Il / Elle a … ans." },
+            { f: "Woher kommst du?", b: "Tu es d'où ?" },
+            { f: "Ich bin aus… / Ich komme aus…", b: "Je suis de…" },
+            { f: "Ich wohne in… / in der Nähe von…", b: "J'habite à… / près de…" },
+            // --- Zahlen 1–20 ---
+            { f: "eins", b: "un" },
+            { f: "zwei", b: "deux" },
+            { f: "drei", b: "trois" },
+            { f: "vier", b: "quatre" },
+            { f: "fünf", b: "cinq" },
+            { f: "sechs", b: "six" },
+            { f: "sieben", b: "sept" },
+            { f: "acht", b: "huit" },
+            { f: "neun", b: "neuf" },
+            { f: "zehn", b: "dix" },
+            { f: "elf", b: "onze" },
+            { f: "zwölf", b: "douze" },
+            { f: "dreizehn", b: "treize" },
+            { f: "vierzehn", b: "quatorze" },
+            { f: "fünfzehn", b: "quinze" },
+            { f: "sechzehn", b: "seize" },
+            { f: "siebzehn", b: "dix-sept" },
+            { f: "achtzehn", b: "dix-huit" },
+            { f: "neunzehn", b: "dix-neuf" },
+            { f: "zwanzig", b: "vingt" },
+            // --- Familie & Personen ---
+            { f: "die Familie", b: "la famille" },
+            { f: "die Eltern", b: "les parents" },
+            { f: "die Mutter / die Mama", b: "la mère / la maman" },
+            { f: "der Vater / der Papa", b: "le père / le papa" },
+            { f: "die Geschwister", b: "les frères et sœurs" },
+            { f: "der Bruder", b: "le frère" },
+            { f: "die Schwester", b: "la sœur" },
+            { f: "der Halbbruder", b: "le demi-frère" },
+            { f: "die Halbschwester", b: "la demi-sœur" },
+            { f: "die Großeltern", b: "les grands-parents" },
+            { f: "der Großvater", b: "le grand-père" },
+            { f: "die Großmutter", b: "la grand-mère" },
+            { f: "der Onkel", b: "l'oncle" },
+            { f: "die Tante", b: "la tante" },
+            { f: "der Cousin / die Cousine", b: "le cousin / la cousine" },
+            { f: "der Freund / die Freundin", b: "l'ami / l'amie" },
+            { f: "die Freunde", b: "les amis" },
+            { f: "der Kumpel / die Kumpels", b: "le copain / les copains" },
+            { f: "der Junge", b: "le garçon" },
+            { f: "das Mädchen", b: "la fille" },
+            { f: "Wer ist das?", b: "C'est qui ?" },
+            { f: "Das ist… / Das sind…", b: "C'est… / Ce sont…" },
+            { f: "Hast du Geschwister?", b: "Tu as des frères et sœurs ?" },
+            // --- Haustiere ---
+            { f: "das Tier / die Tiere", b: "l'animal / les animaux" },
+            { f: "der Hund", b: "le chien" },
+            { f: "die Katze", b: "le chat" },
+            { f: "der Fisch", b: "le poisson" },
+            { f: "das Kaninchen", b: "le lapin" },
+            { f: "die Schildkröte", b: "la tortue" },
+            { f: "die Ratte", b: "le rat" },
+            { f: "Hast du ein Tier?", b: "Tu as un animal ?" },
+            // --- Interessen, Vorlieben & Hobbys ---
+            { f: "Ich mag… / Magst du…?", b: "J'aime… / Tu aimes… ?" },
+            { f: "Ich mag … nicht. / Ich hasse…", b: "Je n'aime pas… / Je déteste…" },
+            { f: "Ich liebe… / Ich mag … sehr gerne.", b: "J'adore…" },
+            { f: "Ich bin Fan von…", b: "Je suis fan de…" },
+            { f: "Mein Ding ist…", b: "Mon truc, c'est…" },
+            { f: "… das ist nicht mein Ding.", b: "… ce n'est pas mon truc." },
+            { f: "ich auch", b: "moi aussi" },
+            { f: "ich nicht", b: "moi non" },
+            { f: "ich doch / ich schon", b: "moi si" },
+            { f: "ich auch nicht", b: "moi non plus" },
+            { f: "der Basketball", b: "le basket" },
+            { f: "das Klettern", b: "l'escalade" },
+            { f: "der Kampfsport", b: "les arts martiaux" },
+            { f: "das Tanzen", b: "la danse" },
+            { f: "die Videospiele", b: "les jeux vidéo" },
+            { f: "die Musik", b: "la musique" },
+            { f: "die Gitarre", b: "la guitare" },
+            { f: "das Klavier", b: "le piano" },
+            { f: "(Musik) hören", b: "écouter (de la musique)" },
+            { f: "(Serien / Videos) schauen", b: "regarder (des séries / des vidéos)" },
+            { f: "das Theater", b: "le théâtre" },
+            { f: "die Natur", b: "la nature" },
+            { f: "zeichnen", b: "dessiner" },
+            { f: "die Mangas", b: "les mangas" },
+            { f: "die Comics", b: "les BD" },
+            { f: "mein Lieblingssänger", b: "mon chanteur préféré" },
+            { f: "meine Lieblingssängerin", b: "ma chanteuse préférée" },
+            { f: "mein Lieblingsspieler", b: "mon joueur préféré" },
+            { f: "meine Lieblingsspielerin", b: "ma joueuse préférée" },
+            // --- Essen & Farben ---
+            { f: "die Schokolade", b: "le chocolat" },
+            { f: "die Pizza", b: "la pizza" },
+            { f: "die Spaghetti", b: "les spaghettis" },
+            { f: "die Tomaten", b: "les tomates" },
+            { f: "der Salat", b: "la salade" },
+            { f: "Blau", b: "le bleu" },
+            { f: "Rot", b: "le rouge" },
+            { f: "Grün", b: "le vert" },
+            { f: "Schwarz", b: "le noir" },
+            { f: "Gelb", b: "le jaune" },
+            { f: "Weiß", b: "le blanc" },
+            // --- Stadt & Wohnen ---
+            { f: "die Stadt", b: "la ville" },
+            { f: "das Viertel / Stadtviertel", b: "le quartier" },
+            { f: "die Bäckerei", b: "une boulangerie" },
+            { f: "das Kino", b: "un cinéma" },
+            { f: "das Museum", b: "un musée" },
+            { f: "das Geschäft", b: "un magasin" },
+            { f: "der Bahnhof", b: "une gare" },
+            { f: "das Einkaufszentrum", b: "un centre commercial" },
+            { f: "der Park", b: "un parc" },
+            { f: "das Café", b: "un café" },
+            { f: "das Restaurant", b: "un restaurant" },
+            { f: "die Kathedrale", b: "une cathédrale" },
+            { f: "der Turm", b: "une tour" },
+            { f: "das Stadion", b: "un stade" },
+            { f: "die Wohnung", b: "l'appartement" },
+            { f: "der Eingang", b: "l'entrée" },
+            { f: "der Flur", b: "le couloir" },
+            { f: "das Wohnzimmer", b: "le salon" },
+            { f: "die Küche", b: "la cuisine" },
+            { f: "das Badezimmer", b: "la salle de bains" },
+            { f: "die Toilette", b: "les toilettes" },
+            { f: "das (eigene) Zimmer", b: "la chambre" },
+            { f: "der Computer", b: "un ordinateur" },
+            { f: "die Konsole", b: "une console" },
+            { f: "die Lautsprecher / Boxen", b: "des enceintes" },
+            { f: "das Poster", b: "un poster" },
+            { f: "die Pflanze", b: "une plante" },
+            // --- Schulalltag ---
+            { f: "der Tisch", b: "la table" },
+            { f: "die Hausaufgaben", b: "les devoirs" },
+            { f: "das Heft", b: "le cahier" },
+            { f: "das Buch", b: "le livre" },
+            { f: "der Kugelschreiber", b: "le stylo" },
+            { f: "der Bleistift", b: "le crayon" },
+            { f: "das Mäppchen", b: "la trousse" },
+            { f: "die Tafel", b: "le tableau" },
+            { f: "das Klassenzimmer", b: "la salle de classe" },
+            { f: "der Lehrer / die Lehrerin", b: "le professeur / la professeure" },
+            { f: "die Mittelschule", b: "le collège" },
+            { f: "die 7. Klasse", b: "la cinquième" },
+            { f: "der Lehrer / die Lehrerin (kurz)", b: "le prof / la prof" },
+            { f: "die Schüler", b: "les élèves" },
+            { f: "das Blatt (Papier)", b: "la feuille" },
+            { f: "das Arbeitsheft", b: "le carnet d'activités" },
+            { f: "Ich verstehe das nicht.", b: "Je ne comprends pas." },
+            // --- Mein Zimmer ---
+            { f: "das Bett", b: "le lit" },
+            { f: "der Schreibtisch", b: "le bureau" },
+            { f: "der Stuhl", b: "la chaise" },
+            { f: "der Schrank", b: "l'armoire" },
+            { f: "das Regal", b: "l'étagère" },
+            { f: "die Lampe", b: "la lampe" },
+            { f: "der Teppich", b: "le tapis" },
+            { f: "das Fenster", b: "la fenêtre" },
+            { f: "die Tür", b: "la porte" },
+            // --- Präpositionen ---
+            { f: "auf", b: "sur" },
+            { f: "unter", b: "sous" },
+            { f: "vor", b: "devant" },
+            { f: "hinter", b: "derrière" },
+            { f: "neben", b: "à côté de" },
+            { f: "in", b: "dans" },
+            { f: "zwischen", b: "entre" },
+            { f: "gegenüber", b: "en face de" },
+            { f: "rechts von", b: "à droite de" },
+            { f: "links von", b: "à gauche de" },
+            // --- Verb faire & Verneinung ---
+            { f: "Ich mache", b: "Je fais" },
+            { f: "du machst", b: "tu fais" },
+            { f: "er/sie macht", b: "il/elle fait" },
+            { f: "wir machen", b: "nous faisons" },
+            { f: "ihr macht", b: "vous faites" },
+            { f: "sie machen", b: "ils/elles font" },
+            { f: "Ich spiele Fußball.", b: "Je fais du foot." },
+            { f: "Sie tanzt.", b: "Elle fait de la danse." },
+            { f: "nicht", b: "ne … pas" },
+            { f: "nicht mehr", b: "ne … plus" },
+            // --- Grammatik & Verben ---
+            { f: "sein", b: "être" },
+            { f: "haben", b: "avoir" },
+            { f: "wohnen", b: "habiter" },
+            { f: "arbeiten / lernen", b: "travailler" },
+            { f: "mögen / lieben", b: "aimer" },
+            { f: "spielen", b: "jouer" },
+            { f: "der Sport / der Fußball", b: "le sport / le foot" },
+            { f: "das Shopping / das Einkaufen", b: "le shopping" },
+            { f: "Es gibt…", b: "Il y a…" },
+            { f: "klein", b: "petit(e)" },
+            { f: "groß", b: "grand(e)" },
+            { f: "hübsch", b: "joli(e)" },
+        ];
+
+        let currentIndex = 0;
+
+        function updateCard() {
+            const card = cards[currentIndex];
+            document.getElementById('front-text').innerText = card.f;
+            document.getElementById('back-text').innerText = card.b;
+            document.getElementById('card').classList.remove('is-flipped');
+            document.getElementById('counter').innerText = `Karte ${currentIndex + 1} von ${cards.length}`;
+
+            // Lade Status aus LocalStorage
+            const learnedData = JSON.parse(localStorage.getItem('learnedCards') || '[]');
+            const isLearned = learnedData.includes(card.f);
+            document.getElementById('learn-btn').innerText = isLearned ? "Gelernt! (Entfernen)" : "Als gelernt markieren";
+        }
+
+        function flipCard() {
+            document.getElementById('card').classList.toggle('is-flipped');
+        }
+
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % cards.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+            updateCard();
+        }
+
+        function markAsLearned() {
+            let learnedData = JSON.parse(localStorage.getItem('learnedCards') || '[]');
+            const cardFront = cards[currentIndex].f;
+
+            if (learnedData.includes(cardFront)) {
+                learnedData = learnedData.filter(item => item !== cardFront);
+            } else {
+                learnedData.push(cardFront);
+            }
+
+            localStorage.setItem('learnedCards', JSON.stringify(learnedData));
+            updateCard();
+        }
+
+        updateCard();
+    </script>
+</body>
+</html>

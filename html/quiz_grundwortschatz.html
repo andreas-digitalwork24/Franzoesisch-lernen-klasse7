@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Grundwortschatz-Quiz - Französisch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav><a href="index.html">← Zurück</a></nav>
+    <main>
+        <div id="quiz-container" class="card">
+            <p id="progress" style="color: #888; font-size: 0.9em; margin-bottom: 8px;"></p>
+            <h2 id="question">Frage lädt...</h2>
+            <div id="answers" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <p id="result-msg" style="font-weight: bold; margin-top: 15px;"></p>
+        </div>
+    </main>
+
+    <script>
+        const questions = [
+            // === 1. Begrüßung, Befinden und Verabschiedung ===
+            { q: "Was bedeutet 'Salut'?", a: ["Hallo / Hi", "Auf Wiedersehen", "Guten Morgen"], correct: 0 },
+            { q: "Was bedeutet 'Bonjour'?", a: ["Guten Tag / Hallo", "Bis morgen", "Tschüss"], correct: 0 },
+            { q: "Was bedeutet 'Coucou'?", a: ["Kuckuck / Hallo (umgangssprachlich)", "Guten Tag", "Bis später"], correct: 0 },
+            { q: "Was bedeutet 'Ça va ?'", a: ["Wie geht's?", "Wie heißt du?", "Woher kommst du?"], correct: 0 },
+            { q: "Was bedeutet 'Super !'?", a: ["Super! / Toll!", "Schade!", "Naja."], correct: 0 },
+            { q: "Was bedeutet 'Bof'?", a: ["Naja. / Geht so.", "Toll!", "Auf Wiedersehen."], correct: 0 },
+            { q: "Was bedeutet 'À plus !'?", a: ["Bis dann! / Tschüss!", "Bis morgen!", "Guten Abend!"], correct: 0 },
+            { q: "Was bedeutet 'Au revoir'?", a: ["Auf Wiedersehen", "Hallo", "Bis morgen"], correct: 0 },
+            { q: "Was bedeutet 'À demain'?", a: ["Bis morgen", "Bis dann", "Auf Wiedersehen"], correct: 0 },
+            { q: "Wie sagt man 'Wie geht's?' auf Französisch?", a: ["Ça va ?", "Comment tu t'appelles ?", "Tu as quel âge ?"], correct: 0 },
+            { q: "Wie sagt man 'Auf Wiedersehen' auf Französisch?", a: ["Au revoir", "À plus", "À demain"], correct: 0 },
+            { q: "Was bedeutet 'Salut les copains !'?", a: ["Hallo Freunde!", "Hallo Jungs!", "Hallo Mädchen!"], correct: 0 },
+            { q: "Was bedeutet 'Ça va. / Moi, ça va !'?", a: ["Es geht. / Mir geht es gut!", "Wie geht's?", "Super!"], correct: 0 },
+
+            // === 2. Persönliche Informationen ===
+            { q: "Was bedeutet 'Tu t'appelles comment ?'", a: ["Wie heißt du?", "Wie alt bist du?", "Woher kommst du?"], correct: 0 },
+            { q: "Wie sagt man 'Ich heiße…' auf Französisch?", a: ["Je m'appelle…", "J'ai … ans.", "Je suis de…"], correct: 0 },
+            { q: "Was bedeutet 'Tu as quel âge ?'", a: ["Wie alt bist du?", "Wie heißt du?", "Wo wohnst du?"], correct: 0 },
+            { q: "Wie sagt man 'Ich bin 12 Jahre alt.' auf Französisch?", a: ["J'ai 12 ans.", "Je suis 12 ans.", "J'habite 12 ans."], correct: 0 },
+            { q: "Was bedeutet 'Tu es d'où ?'", a: ["Woher kommst du?", "Wo wohnst du?", "Wie alt bist du?"], correct: 0 },
+            { q: "Wie sagt man 'Ich bin aus München.' auf Französisch?", a: ["Je suis de Munich.", "J'habite à Munich.", "Je m'appelle Munich."], correct: 0 },
+            { q: "Was bedeutet 'J'habite à…'?", a: ["Ich wohne in…", "Ich bin aus…", "Ich heiße…"], correct: 0 },
+            { q: "Wie heißt die Zahl 20 auf Französisch?", a: ["vingt", "dix", "quinze"], correct: 0 },
+            { q: "Wie heißt die Zahl 10 auf Französisch?", a: ["dix", "deux", "douze"], correct: 0 },
+            { q: "Wie heißt die Zahl 15 auf Französisch?", a: ["quinze", "cinq", "seize"], correct: 0 },
+            { q: "Was bedeutet 'seize' auf Deutsch?", a: ["16", "6", "26"], correct: 0 },
+            { q: "Wie heißt 'drei' auf Französisch?", a: ["trois", "deux", "treize"], correct: 0 },
+            { q: "Was bedeutet 'Il / Elle a quel âge ?'", a: ["Wie alt ist er / sie?", "Wer ist er / sie?", "Woher kommt er / sie?"], correct: 0 },
+
+            // === 3. Familie, Freunde und Personen ===
+            { q: "Was bedeutet 'la famille'?", a: ["die Familie", "die Freunde", "die Eltern"], correct: 0 },
+            { q: "Was bedeutet 'les parents'?", a: ["die Eltern", "die Geschwister", "die Großeltern"], correct: 0 },
+            { q: "Wie sagt man 'die Mutter' auf Französisch?", a: ["la mère", "la sœur", "la fille"], correct: 0 },
+            { q: "Wie sagt man 'der Vater' auf Französisch?", a: ["le père", "le frère", "le garçon"], correct: 0 },
+            { q: "Was bedeutet 'le frère'?", a: ["der Bruder", "der Vater", "der Großvater"], correct: 0 },
+            { q: "Was bedeutet 'la sœur'?", a: ["die Schwester", "die Mutter", "die Großmutter"], correct: 0 },
+            { q: "Was bedeutet 'les grands-parents'?", a: ["die Großeltern", "die Eltern", "die Geschwister"], correct: 0 },
+            { q: "Wie sagt man 'der Großvater' auf Französisch?", a: ["le grand-père", "le père", "le demi-frère"], correct: 0 },
+            { q: "Was bedeutet 'la grand-mère'?", a: ["die Großmutter", "die Mutter", "die Tante"], correct: 0 },
+            { q: "Was bedeutet 'l'ami(e)'?", a: ["der Freund / die Freundin", "der Bruder / die Schwester", "der Cousin / die Cousine"], correct: 0 },
+            { q: "Was bedeutet 'le garçon'?", a: ["der Junge", "der Mann", "der Freund"], correct: 0 },
+            { q: "Was bedeutet 'la fille'?", a: ["das Mädchen", "die Frau", "die Schwester"], correct: 0 },
+            { q: "Wie sagt man 'der Onkel' auf Französisch?", a: ["l'oncle", "le père", "le grand-père"], correct: 0 },
+            { q: "Was bedeutet 'la tante'?", a: ["die Tante", "die Mutter", "die Cousine"], correct: 0 },
+            { q: "Was bedeutet 'le demi-frère'?", a: ["der Halbbruder", "der Bruder", "der Cousin"], correct: 0 },
+
+            // === 4. Haustiere ===
+            { q: "Was bedeutet 'l'animal'?", a: ["das Tier", "das Haustier", "die Pflanze"], correct: 0 },
+            { q: "Wie sagt man 'der Hund' auf Französisch?", a: ["le chien", "le chat", "le rat"], correct: 0 },
+            { q: "Was bedeutet 'le chat'?", a: ["die Katze", "die Maus", "der Hund"], correct: 0 },
+            { q: "Was bedeutet 'le poisson'?", a: ["der Fisch", "die Schlange", "der Vogel"], correct: 0 },
+            { q: "Wie sagt man 'das Kaninchen' auf Französisch?", a: ["le lapin", "la tortue", "le rat"], correct: 0 },
+            { q: "Was bedeutet 'la tortue'?", a: ["die Schildkröte", "die Ratte", "das Kaninchen"], correct: 0 },
+            { q: "Was bedeutet 'le rat'?", a: ["die Ratte", "die Maus", "das Kaninchen"], correct: 0 },
+
+            // === 5. Interessen, Vorlieben und Hobbys ===
+            { q: "Was bedeutet 'J'aime…'?", a: ["Ich mag…", "Ich hasse…", "Ich liebe…"], correct: 0 },
+            { q: "Was bedeutet 'J'adore…'?", a: ["Ich liebe…", "Ich mag…", "Ich möchte…"], correct: 0 },
+            { q: "Was bedeutet 'Je déteste…'?", a: ["Ich hasse…", "Ich liebe…", "Ich mag… nicht"], correct: 0 },
+            { q: "Was bedeutet 'Je n'aime pas…'?", a: ["Ich mag … nicht.", "Ich hasse…", "Ich liebe…"], correct: 0 },
+            { q: "Was bedeutet 'le sport'?", a: ["der Sport", "der Ball", "das Spiel"], correct: 0 },
+            { q: "Wie sagt man 'der Fußball' auf Französisch?", a: ["le foot", "le basket", "le sport"], correct: 0 },
+            { q: "Was bedeutet 'le basket'?", a: ["der Basketball", "der Fußball", "der Volleyball"], correct: 0 },
+            { q: "Was bedeutet 'l'escalade'?", a: ["das Klettern", "das Schwimmen", "das Radfahren"], correct: 0 },
+            { q: "Was bedeutet 'les arts martiaux'?", a: ["der Kampfsport", "das Klettern", "das Tanzen"], correct: 0 },
+            { q: "Wie sagt man 'das Tanzen' auf Französisch?", a: ["la danse", "l'escalade", "la natation"], correct: 0 },
+            { q: "Was bedeutet 'les jeux vidéo'?", a: ["die Videospiele", "die Musik", "die Comics"], correct: 0 },
+            { q: "Was bedeutet 'la musique'?", a: ["die Musik", "das Konzert", "der Tanz"], correct: 0 },
+            { q: "Wie sagt man 'die Gitarre' auf Französisch?", a: ["la guitare", "le piano", "la musique"], correct: 0 },
+            { q: "Was bedeutet 'le piano'?", a: ["das Klavier", "die Geige", "die Gitarre"], correct: 0 },
+            { q: "Was bedeutet 'le théâtre'?", a: ["das Theater", "das Kino", "das Museum"], correct: 0 },
+            { q: "Was bedeutet 'les mangas'?", a: ["die Mangas", "die Comics", "die Bücher"], correct: 0 },
+            { q: "Was bedeutet 'les BD'?", a: ["die Comics", "die Mangas", "die Zeitschriften"], correct: 0 },
+            { q: "Was bedeutet 'dessiner'?", a: ["zeichnen", "singen", "spielen"], correct: 0 },
+            { q: "Was bedeutet 'écouter (de la musique)'?", a: ["(Musik) hören", "(Musik) spielen", "(Musik) kaufen"], correct: 0 },
+            { q: "Was bedeutet 'regarder (des séries)'?", a: ["(Serien) schauen", "(Serien) hören", "(Serien) lesen"], correct: 0 },
+            { q: "Was bedeutet 'Mon truc, c'est…'?", a: ["Mein Ding ist…", "Ich mag kein…", "Mein Lieblingsding ist nicht…"], correct: 0 },
+            { q: "Was bedeutet '… ce n'est pas mon truc.'?", a: ["… das ist nicht mein Ding.", "… das ist mein Ding.", "… das mag ich sehr."], correct: 0 },
+            { q: "Was bedeutet 'moi aussi'?", a: ["ich auch", "ich nicht", "ich auch nicht"], correct: 0 },
+            { q: "Was bedeutet 'moi non plus'?", a: ["ich auch nicht", "ich auch", "ich doch"], correct: 0 },
+
+            // === 6. Essen, Trinken und Farben ===
+            { q: "Was bedeutet 'le chocolat'?", a: ["die Schokolade", "das Eis", "die Bonbons"], correct: 0 },
+            { q: "Wie sagt man 'die Pizza' auf Französisch?", a: ["la pizza", "le chocolat", "la salade"], correct: 0 },
+            { q: "Was bedeutet 'les spaghettis'?", a: ["die Spaghetti", "die Pizza", "die Tomaten"], correct: 0 },
+            { q: "Was bedeutet 'les tomates'?", a: ["die Tomaten", "die Karotten", "die Gurken"], correct: 0 },
+            { q: "Was bedeutet 'la salade'?", a: ["der Salat", "die Suppe", "das Brot"], correct: 0 },
+            { q: "Wie sagt man 'Blau' auf Französisch?", a: ["le bleu", "le rouge", "le vert"], correct: 0 },
+            { q: "Was bedeutet 'le rouge'?", a: ["Rot", "Grün", "Blau"], correct: 0 },
+            { q: "Was bedeutet 'le vert'?", a: ["Grün", "Blau", "Gelb"], correct: 0 },
+            { q: "Wie sagt man 'Schwarz' auf Französisch?", a: ["le noir", "le blanc", "le bleu"], correct: 0 },
+            { q: "Was bedeutet 'le jaune'?", a: ["Gelb", "Orange", "Braun"], correct: 0 },
+            { q: "Was bedeutet 'le blanc'?", a: ["Weiß", "Grau", "Schwarz"], correct: 0 },
+
+            // === 7. Stadt und Wohnen ===
+            { q: "Was bedeutet 'la ville'?", a: ["die Stadt", "das Dorf", "das Land"], correct: 0 },
+            { q: "Was bedeutet 'le quartier'?", a: ["das Viertel", "die Straße", "der Platz"], correct: 0 },
+            { q: "Wie sagt man 'eine Bäckerei' auf Französisch?", a: ["une boulangerie", "une gare", "un cinéma"], correct: 0 },
+            { q: "Was bedeutet 'un cinéma'?", a: ["ein Kino", "ein Theater", "ein Museum"], correct: 0 },
+            { q: "Was bedeutet 'un musée'?", a: ["ein Museum", "ein Kino", "ein Park"], correct: 0 },
+            { q: "Wie sagt man 'ein Bahnhof' auf Französisch?", a: ["une gare", "un parc", "une boulangerie"], correct: 0 },
+            { q: "Was bedeutet 'un parc'?", a: ["ein Park", "ein Platz", "ein Garten"], correct: 0 },
+            { q: "Was bedeutet 'un centre commercial'?", a: ["ein Einkaufszentrum", "ein Kino", "ein Café"], correct: 0 },
+            { q: "Was bedeutet 'l'appartement'?", a: ["die Wohnung", "das Haus", "das Zimmer"], correct: 0 },
+            { q: "Was bedeutet 'le couloir'?", a: ["der Flur", "das Wohnzimmer", "die Küche"], correct: 0 },
+            { q: "Wie sagt man 'das Zimmer / Schlafzimmer' auf Französisch?", a: ["la chambre", "le salon", "la cuisine"], correct: 0 },
+            { q: "Was bedeutet 'le salon'?", a: ["das Wohnzimmer", "die Küche", "das Badezimmer"], correct: 0 },
+            { q: "Was bedeutet 'la cuisine'?", a: ["die Küche", "das Wohnzimmer", "das Schlafzimmer"], correct: 0 },
+            { q: "Was bedeutet 'la salle de bains'?", a: ["das Badezimmer", "die Küche", "das Wohnzimmer"], correct: 0 },
+            { q: "Was bedeutet 'un lit'?", a: ["ein Bett", "ein Stuhl", "ein Tisch"], correct: 0 },
+            { q: "Was bedeutet 'une armoire'?", a: ["ein Schrank", "ein Regal", "ein Bett"], correct: 0 },
+            { q: "Wie sagt man 'ein Schreibtisch' auf Französisch?", a: ["un bureau", "une étagère", "une table"], correct: 0 },
+            { q: "Was bedeutet 'une chaise'?", a: ["ein Stuhl", "ein Sessel", "ein Sofa"], correct: 0 },
+            { q: "Was bedeutet 'une étagère'?", a: ["ein Regal", "ein Schrank", "eine Kommode"], correct: 0 },
+            { q: "Wie sagt man 'ein Computer' auf Französisch?", a: ["un ordinateur", "une console", "un poster"], correct: 0 },
+            { q: "Was bedeutet 'une console'?", a: ["eine Konsole", "ein Computer", "eine Kamera"], correct: 0 },
+            { q: "Was bedeutet 'des enceintes'?", a: ["Lautsprecher", "Kopfhörer", "Kabel"], correct: 0 },
+            { q: "Was bedeutet 'une plante'?", a: ["eine Pflanze", "eine Lampe", "ein Bild"], correct: 0 },
+            { q: "Was bedeutet 'une cathédrale'?", a: ["eine Kathedrale", "ein Turm", "ein Stadion"], correct: 0 },
+
+            // === 8. Schulalltag ===
+            { q: "Was bedeutet 'le collège'?", a: ["die Mittelschule", "die Grundschule", "das Gymnasium"], correct: 0 },
+            { q: "Was bedeutet 'la cinquième'?", a: ["die 7. Klasse (Frankreich)", "die 5. Klasse", "die 6. Klasse"], correct: 0 },
+            { q: "Was bedeutet 'le prof (la prof)'?", a: ["der Lehrer / die Lehrerin", "der Schüler / die Schülerin", "der Direktor"], correct: 0 },
+            { q: "Was bedeutet 'les élèves'?", a: ["die Schüler", "die Lehrer", "die Eltern"], correct: 0 },
+            { q: "Wie sagt man 'die Tafel' auf Französisch?", a: ["le tableau", "la table", "la porte"], correct: 0 },
+            { q: "Was bedeutet 'la table'?", a: ["der Tisch", "der Stuhl", "die Tafel"], correct: 0 },
+            { q: "Was bedeutet 'le livre'?", a: ["das Buch", "das Heft", "das Blatt"], correct: 0 },
+            { q: "Was bedeutet 'le cahier'?", a: ["das Heft", "das Buch", "das Mäppchen"], correct: 0 },
+            { q: "Wie sagt man 'der Stift' auf Französisch?", a: ["le stylo", "le crayon", "la règle"], correct: 0 },
+            { q: "Was bedeutet 'les devoirs'?", a: ["die Hausaufgaben", "die Bücher", "die Noten"], correct: 0 },
+            { q: "Was bedeutet 'la feuille'?", a: ["das Blatt", "das Heft", "das Buch"], correct: 0 },
+            { q: "Was bedeutet 'le carnet d'activités'?", a: ["das Arbeitsheft", "das Notizbuch", "das Lernheft"], correct: 0 },
+            { q: "Was bedeutet 'Écoutez !'?", a: ["Hört!", "Lest!", "Schreibt!"], correct: 0 },
+            { q: "Was bedeutet 'Regardez !'?", a: ["Schaut!", "Hört!", "Sprecht!"], correct: 0 },
+            { q: "Was bedeutet 'Lisez !'?", a: ["Lest!", "Schreibt!", "Sprecht!"], correct: 0 },
+            { q: "Was bedeutet 'Écrivez !'?", a: ["Schreibt!", "Lest!", "Hört!"], correct: 0 },
+            { q: "Was bedeutet 'Parlez !'?", a: ["Sprecht!", "Hört!", "Lest!"], correct: 0 },
+            { q: "Was bedeutet 'Répétez !'?", a: ["Wiederholt!", "Antwortet!", "Schreibt!"], correct: 0 },
+            { q: "Was bedeutet 'Prenez une feuille !'?", a: ["Nehmt ein Blatt!", "Öffnet ein Buch!", "Schließt das Heft!"], correct: 0 },
+            { q: "Was bedeutet 'Répondez !'?", a: ["Antwortet!", "Lest!", "Sucht!"], correct: 0 },
+            { q: "Was bedeutet 'Cherchez !'?", a: ["Sucht!", "Findet!", "Hört!"], correct: 0 },
+            { q: "Was bedeutet 'Fermez (les livres) !'?", a: ["Schließt (die Bücher)!", "Öffnet (die Bücher)!", "Nehmt (die Bücher)!"], correct: 0 },
+            { q: "Was bedeutet 'Jouez !'?", a: ["Spielt!", "Lest!", "Schreibt!"], correct: 0 },
+            { q: "Was bedeutet 'Je ne comprends pas.'?", a: ["Ich verstehe das nicht.", "Ich weiß es nicht.", "Ich höre das nicht."], correct: 0 },
+            { q: "Was bedeutet 'Ah, ça sonne !'?", a: ["Ah, es klingelt!", "Ah, es läutet!", "Ah, die Pause!"], correct: 0 },
+            { q: "Was bedeutet 'C'est terminé !'?", a: ["Es ist beendet / Schluss!", "Es beginnt!", "Es ist gut!"], correct: 0 },
+            { q: "Was bedeutet 'Tiens !'?", a: ["Hier, nimm!", "Danke!", "Schade!"], correct: 0 },
+            { q: "Was bedeutet 'C'est dommage.'?", a: ["Das ist schade.", "Das ist gut.", "Das ist toll."], correct: 0 },
+
+            // === 9. Grammatik-Grundwortschatz ===
+            { q: "Was bedeutet 'ne … pas'?", a: ["nicht", "nicht mehr", "nie"], correct: 0 },
+            { q: "Was bedeutet 'ne … plus'?", a: ["nicht mehr", "nicht", "noch nicht"], correct: 0 },
+            { q: "Was bedeutet die Präposition 'sur'?", a: ["auf", "unter", "in"], correct: 0 },
+            { q: "Was bedeutet 'sous'?", a: ["unter", "auf", "hinter"], correct: 0 },
+            { q: "Was bedeutet 'devant'?", a: ["vor", "hinter", "neben"], correct: 0 },
+            { q: "Was bedeutet 'derrière'?", a: ["hinter", "vor", "zwischen"], correct: 0 },
+            { q: "Was bedeutet 'dans'?", a: ["in", "auf", "neben"], correct: 0 },
+            { q: "Was bedeutet 'entre'?", a: ["zwischen", "neben", "gegenüber"], correct: 0 },
+            { q: "Was bedeutet 'à côté de'?", a: ["neben", "gegenüber", "zwischen"], correct: 0 },
+            { q: "Was bedeutet 'en face de'?", a: ["gegenüber", "neben", "vor"], correct: 0 },
+            { q: "Was bedeutet 'à droite de'?", a: ["rechts von", "links von", "gegenüber"], correct: 0 },
+            { q: "Was bedeutet 'à gauche de'?", a: ["links von", "rechts von", "neben"], correct: 0 },
+            { q: "Welche Artikel sind bestimmte Artikel im Französischen?", a: ["le, la, l', les", "un, une, des", "mon, ma, mes"], correct: 0 },
+            { q: "Welche Artikel sind unbestimmte Artikel im Französischen?", a: ["un, une, des", "le, la, l', les", "du, de la, des"], correct: 0 },
+            { q: "Was bedeutet 'Il y a…'?", a: ["Es gibt…", "Wo ist…?", "Ich habe…"], correct: 0 },
+            { q: "Was bedeutet 'Est-ce que… ?'?", a: ["Frageeinleitung", "Verneinungspartikel", "Ausruf"], correct: 0 },
+            { q: "Was bedeutet 'Qu'est-ce que… ?'?", a: ["Was…?", "Wie…?", "Wer…?"], correct: 0 },
+            { q: "Was bedeutet 'Comment'?", a: ["Wie", "Wo", "Wer"], correct: 0 },
+            { q: "Was bedeutet 'petit(e)'?", a: ["klein", "groß", "hübsch"], correct: 0 },
+            { q: "Was bedeutet 'grand(e)'?", a: ["groß", "klein", "schnell"], correct: 0 },
+            { q: "Was bedeutet 'joli(e)'?", a: ["hübsch", "groß", "klein"], correct: 0 },
+            { q: "Was bedeutet 'mon / ma / mes'?", a: ["mein / meine / meine (Pl.)", "dein / deine / deine (Pl.)", "sein / seine / seine (Pl.)"], correct: 0 },
+            { q: "Was bedeutet 'ton / ta / tes'?", a: ["dein / deine / deine (Pl.)", "mein / meine / meine (Pl.)", "sein / seine / seine (Pl.)"], correct: 0 },
+            { q: "Was bedeutet 'son / sa / ses'?", a: ["sein / ihr / seine-ihre (Pl.)", "mein / meine / meine (Pl.)", "dein / deine / deine (Pl.)"], correct: 0 },
+            { q: "Warum sagt man 'mon amie' statt 'ma amie'?", a: ["Weil das Nomen mit Vokal beginnt", "Weil 'amie' männlich ist", "Weil 'ma' nur im Plural steht"], correct: 0 },
+            { q: "Was bedeutet 'être'?", a: ["sein", "haben", "machen"], correct: 0 },
+            { q: "Was bedeutet 'avoir'?", a: ["haben", "sein", "machen"], correct: 0 },
+            { q: "Was bedeutet 'habiter'?", a: ["wohnen", "arbeiten", "spielen"], correct: 0 },
+            { q: "Was bedeutet 'aimer'?", a: ["mögen / lieben", "hassen", "wohnen"], correct: 0 },
+        ];
+
+        let score = 0;
+        let qIndex = 0;
+
+        function loadQuestion() {
+            const current = questions[qIndex];
+            document.getElementById('progress').innerText = `Frage ${qIndex + 1} von ${questions.length}`;
+            document.getElementById('question').innerText = current.q;
+            const answersDiv = document.getElementById('answers');
+            answersDiv.innerHTML = '';
+            document.getElementById('result-msg').innerText = '';
+
+            const shuffled = current.a
+                .map((text, i) => ({ text, isCorrect: i === current.correct }))
+                .sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const btn = document.createElement('button');
+                btn.innerText = item.text;
+                btn.onclick = () => checkAnswer(item.isCorrect, current.a[current.correct]);
+                answersDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, correctText) {
+            if (isCorrect) {
+                score++;
+                document.getElementById('result-msg').style.color = "green";
+                document.getElementById('result-msg').innerText = "Richtig! Bravo !";
+            } else {
+                document.getElementById('result-msg').style.color = "red";
+                document.getElementById('result-msg').innerText = "Falsch! Die richtige Antwort war: " + correctText;
+            }
+
+            setTimeout(() => {
+                qIndex++;
+                if (qIndex < questions.length) loadQuestion();
+                else finishQuiz();
+            }, 1500);
+        }
+
+        function finishQuiz() {
+            const pct = Math.round((score / questions.length) * 100);
+            localStorage.setItem('lastGrundwortschatzScore', pct);
+            let feedback = pct >= 80 ? "Note 1! Magnifique !" : "Gute Basis, übe noch etwas weiter!";
+            document.getElementById('quiz-container').innerHTML = `<h2>Ergebnis: ${pct}%</h2><p>${score} von ${questions.length} Fragen richtig.</p><p>${feedback}</p><button onclick="location.reload()">Nochmal starten</button>`;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
