@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Großes Quiz - Französisch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav><a href="index.html">← Zurück</a></nav>
+    <main>
+        <div id="quiz-container" class="card">
+            <h2 id="question">Frage lädt...</h2>
+            <div id="answers" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <p id="result-msg" style="font-weight: bold; margin-top: 15px;"></p>
+        </div>
+    </main>
+
+    <script>
+        const questions = [
+            { q: "Was bedeutet 'sur la table'?", a: ["Auf dem Tisch", "Unter dem Tisch", "Im Tisch"], correct: 0 },
+            { q: "Wie heißt 'ihr macht'?", a: ["vous faites", "vous faisons", "ils font"], correct: 0 },
+            { q: "Was bedeutet 'ne … plus'?", a: ["nicht mehr", "nie", "vielleicht"], correct: 0 },
+            { q: "Wie lautet die 1. Person Singular von 'faire'?", a: ["je fais", "je fait", "je faisons"], correct: 0 },
+            { q: "Was bedeutet 'le cahier'?", a: ["das Heft", "das Buch", "das Mäppchen"], correct: 0 },
+            { q: "Was bedeutet 'derrière'?", a: ["hinter", "vor", "neben"], correct: 0 },
+            { q: "Wie heißt 'das Bett' auf Französisch?", a: ["le lit", "la chaise", "le bureau"], correct: 0 },
+            { q: "Was bedeutet 'faire de la danse'?", a: ["tanzen", "Fußball spielen", "schwimmen"], correct: 0 },
+            { q: "Welche Form ist korrekt für 'wir machen'?", a: ["nous faisons", "nous faites", "nous font"], correct: 0 },
+            { q: "Was bedeutet 'la trousse'?", a: ["das Mäppchen", "die Tasche", "das Heft"], correct: 0 },
+            { q: "Wie heißt 'die Tür' auf Französisch?", a: ["la porte", "la fenêtre", "le mur"], correct: 0 },
+            { q: "Was bedeutet 'sous le lit'?", a: ["unter dem Bett", "auf dem Bett", "neben dem Bett"], correct: 0 },
+        ];
+
+        let score = 0;
+        let qIndex = 0;
+
+        function loadQuestion() {
+            const current = questions[qIndex];
+            document.getElementById('question').innerText = current.q;
+            const answersDiv = document.getElementById('answers');
+            answersDiv.innerHTML = '';
+            document.getElementById('result-msg').innerText = '';
+
+            const shuffled = current.a
+                .map((text, i) => ({ text, isCorrect: i === current.correct }))
+                .sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const btn = document.createElement('button');
+                btn.innerText = item.text;
+                btn.onclick = () => checkAnswer(item.isCorrect, current.a[current.correct]);
+                answersDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, correctText) {
+            if (isCorrect) {
+                score++;
+                document.getElementById('result-msg').style.color = "green";
+                document.getElementById('result-msg').innerText = "Richtig! Bravo !";
+            } else {
+                document.getElementById('result-msg').style.color = "red";
+                document.getElementById('result-msg').innerText = "Falsch! Die richtige Antwort war: " + correctText;
+            }
+
+            setTimeout(() => {
+                qIndex++;
+                if (qIndex < questions.length) loadQuestion();
+                else finishQuiz();
+            }, 1500);
+        }
+
+        function finishQuiz() {
+            const pct = Math.round((score / questions.length) * 100);
+            localStorage.setItem('lastQuizScore', pct);
+            let feedback = pct >= 80 ? "Note 1! Magnifique !" : "Gute Basis, übe noch etwas weiter!";
+            document.getElementById('quiz-container').innerHTML = `<h2>Ergebnis: ${pct}%</h2><p>${feedback}</p><button onclick="location.reload()">Nochmal starten</button>`;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
